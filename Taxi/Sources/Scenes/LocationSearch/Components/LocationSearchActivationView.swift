@@ -10,22 +10,19 @@ import SwiftUI
 struct LocationSearchActivationView: View {
     @Environment(\.colorScheme) var colorScheme
 
-    private var textColor: Color {
-        colorScheme == .dark ? Color.white : Color.black
-    }
-    private var backgroundColor: Color {
-        colorScheme == .dark ? Color.white : Color.black
+    private var theme: ColorTheme {
+        ColorManager.getTheme(for: colorScheme)
     }
 
     var body: some View {
         HStack {
             Rectangle()
-                .fill(backgroundColor)
+                .fill(theme.primary)
                 .frame(width: 8, height: 8)
                 .padding(.horizontal)
 
             Text("Where to?")
-                .foregroundColor(textColor)
+                .foregroundColor(theme.primary)
 
             Spacer()
         }
