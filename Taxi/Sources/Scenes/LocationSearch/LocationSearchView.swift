@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LocationSearchView: View {
     @Environment(\.colorScheme) var colorScheme
+    @StateObject private var locationSearchViewModel = LocationSearchViewModel()
     @State private var startLocationText = ""
     @State private var destinationLocationText = ""
 
@@ -19,8 +20,8 @@ struct LocationSearchView: View {
     var body: some View {
         VStack {
             SearchHeaderView(
+                locationSearchViewModel: locationSearchViewModel,
                 startLocationText: $startLocationText,
-                destinationLocationText: $destinationLocationText,
                 primaryColor: theme.primary,
                 secondaryColor: theme.secondary
             )
@@ -32,8 +33,8 @@ struct LocationSearchView: View {
 
             ScrollView {
                 VStack(alignment: .leading) {
-                    ForEach(1..<5, id: \.self) { _ in
-                        LocationSearchResultCell()
+                    ForEach(locationSearchViewModel.results, id: \.self) { result in
+                        LocationSearchResultCell(title: result.title, subtitle: result.subtitle)
                     }
                 }
             }
