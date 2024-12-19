@@ -6,16 +6,19 @@
 //
 
 import SwiftUI
+import MapKit
 
 struct HomeView: View {
+    @StateObject private var locationManager = LocationManager()
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        Map(coordinateRegion: .constant(
+            MKCoordinateRegion(
+                center: locationManager.userLocation?.coordinate ?? CLLocationCoordinate2D(),
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            )
+        ), showsUserLocation: true)
+        .edgesIgnoringSafeArea(.all)
     }
 }
 
