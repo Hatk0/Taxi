@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MapViewActionButton: View {
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var locationSearchViewModel: LocationSearchViewModel
     @Binding var mapState: MapViewState
 
     private var theme: ColorTheme {
@@ -39,8 +40,11 @@ private extension MapViewActionButton {
 
     func actionForState(_ state: MapViewState) {
         switch state {
-        case .searchingForLocation, .locationSelected:
+        case .searchingForLocation:
             mapState = .noInput
+        case .locationSelected:
+            mapState = .noInput
+            locationSearchViewModel.selectedLocationCoordinate = nil
         default:
             break
         }

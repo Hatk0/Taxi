@@ -9,7 +9,7 @@ import SwiftUI
 import MapKit
 
 struct HomeView: View {
-    @StateObject private var locationManager = LocationManager()
+    @EnvironmentObject var locationSearchViewModel: LocationSearchViewModel
     @State private var mapState = MapViewState.noInput
 
     var body: some View {
@@ -41,5 +41,10 @@ struct HomeView: View {
             }
         }
         .ignoresSafeArea(edges: .bottom)
+        .onReceive(LocationManager.shared.$userLocation) { location in
+            if let location = location {
+                locationSearchViewModel.userLocation = location
+            }
+        }
     }
 }
