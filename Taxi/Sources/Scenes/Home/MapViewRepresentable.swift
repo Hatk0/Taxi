@@ -9,6 +9,8 @@ import SwiftUI
 import MapKit
 
 struct MapViewRepresentable: UIViewRepresentable {
+    @EnvironmentObject var locationSearchViewModel: LocationSearchViewModel
+
     let mapView = MKMapView()
     let locationManager = LocationManager()
 
@@ -22,7 +24,9 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
 
     func updateUIView(_ uiView: UIViewType, context: Context) {
-
+        if let selectedLocation = locationSearchViewModel.selectedLocation {
+            print("\(selectedLocation)")
+        }
     }
 
     func makeCoordinator() -> MapCoordinator {
@@ -33,6 +37,7 @@ struct MapViewRepresentable: UIViewRepresentable {
 extension MapViewRepresentable {
 
     class MapCoordinator: NSObject, MKMapViewDelegate {
+
         let parent: MapViewRepresentable
 
         init(parent: MapViewRepresentable) {
@@ -42,7 +47,10 @@ extension MapViewRepresentable {
 
         func mapView(_ mapView: MKMapView, didUpdate userLocation: MKUserLocation) {
             let region = MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: userLocation.coordinate.latitude, longitude: userLocation.coordinate.longitude),
+                center: CLLocationCoordinate2D(
+                    latitude: userLocation.coordinate.latitude,
+                    longitude: userLocation.coordinate.longitude
+                ),
                 span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
             )
 

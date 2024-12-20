@@ -11,18 +11,14 @@ import MapKit
 struct HomeView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var showLocationSearchView = false
+
     var body: some View {
         ZStack(alignment: .top) {
-            Map(coordinateRegion: .constant(
-                MKCoordinateRegion(
-                    center: locationManager.userLocation?.coordinate ?? CLLocationCoordinate2D(),
-                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                )
-            ), showsUserLocation: true)
-            .ignoresSafeArea()
+            MapViewRepresentable()
+                .ignoresSafeArea()
 
             if showLocationSearchView {
-                LocationSearchView()
+                LocationSearchView(showLocationSearchView: $showLocationSearchView)
             } else {
                 LocationSearchActivationView()
                     .padding(.vertical, 72)
@@ -38,8 +34,4 @@ struct HomeView: View {
                 .padding(.top, 4)
         }
     }
-}
-
-#Preview {
-    HomeView()
 }
