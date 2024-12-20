@@ -10,26 +10,26 @@ import MapKit
 
 struct HomeView: View {
     @StateObject private var locationManager = LocationManager()
-    @State private var showLocationSearchView = false
+    @State private var mapState = MapViewState.noInput
 
     var body: some View {
         ZStack(alignment: .top) {
-            MapViewRepresentable()
+            MapViewRepresentable(mapState: $mapState)
                 .ignoresSafeArea()
 
-            if showLocationSearchView {
-                LocationSearchView(showLocationSearchView: $showLocationSearchView)
-            } else {
+            if mapState == .searchingForLocation {
+                LocationSearchView(mapState: $mapState)
+            } else if mapState == .noInput {
                 LocationSearchActivationView()
                     .padding(.vertical, 72)
                     .onTapGesture {
                         withAnimation(.spring) {
-                            showLocationSearchView.toggle()
+                            mapState = .searchingForLocation
                         }
                     }
             }
 
-            MapViewActionButton(showLocationSearchingView: $showLocationSearchView)
+            MapViewActionButton(mapState: $mapState)
                 .padding(.leading)
                 .padding(.top, 4)
         }

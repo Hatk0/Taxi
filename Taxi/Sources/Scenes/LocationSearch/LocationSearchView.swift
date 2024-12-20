@@ -12,7 +12,7 @@ struct LocationSearchView: View {
     @EnvironmentObject var locationSearchViewModel: LocationSearchViewModel
     @State private var startLocationText = ""
     @State private var destinationLocationText = ""
-    @Binding var showLocationSearchView: Bool
+    @Binding var mapState: MapViewState
 
     private var theme: ColorTheme {
         ColorManager.getTheme(for: colorScheme)
@@ -39,7 +39,7 @@ struct LocationSearchView: View {
                             .onTapGesture {
                                 withAnimation(.spring) {
                                     locationSearchViewModel.selectLocation(result)
-                                    showLocationSearchView.toggle()
+                                    mapState = .locationSelected
                                 }
                             }
                     }

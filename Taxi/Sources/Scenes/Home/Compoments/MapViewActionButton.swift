@@ -9,14 +9,18 @@ import SwiftUI
 
 struct MapViewActionButton: View {
     @Environment(\.colorScheme) private var colorScheme
-    @Binding var showLocationSearchingView: Bool
+    @Binding var mapState: MapViewState
 
     private var theme: ColorTheme {
         ColorManager.getTheme(for: colorScheme)
     }
 
     var body: some View {
-        Button(action: toggleView) {
+        Button {
+            withAnimation(.spring) {
+                actionForState(mapState)
+            }
+        } label: {
             buttonContent
                 .padding()
                 .background(theme.secondary)
@@ -28,14 +32,26 @@ struct MapViewActionButton: View {
 
 private extension MapViewActionButton {
     var buttonContent: some View {
-        Image(systemName: showLocationSearchingView ? "arrow.left" : "line.3.horizontal")
+        Image(systemName: imageNameForState(mapState))
             .font(.title2)
             .foregroundStyle(theme.primary)
     }
 
-    func toggleView() {
-        withAnimation(.spring) {
-            showLocationSearchingView.toggle()
+    func actionForState(_ state: MapViewState) {
+        switch state {
+        case .searchingForLocation, .locationSelected:
+            mapState = .noInput
+        default:
+            break
+        }
+    }
+
+    func imageNameForState(_ state: MapViewState) -> String {
+        switch state {
+        case .noInput:
+            return "line.3.horizontal"
+        default:
+            return "arrow.left"
         }
     }
 }
