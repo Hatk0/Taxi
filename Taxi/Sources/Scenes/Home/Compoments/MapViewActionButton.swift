@@ -44,7 +44,7 @@ private extension MapViewActionButton {
             mapState = .noInput
         case .locationSelected:
             mapState = .noInput
-            locationSearchViewModel.selectedLocationCoordinate = nil
+            locationSearchViewModel.selectedLocation = nil
         default:
             break
         }
