@@ -40,10 +40,10 @@ private extension MapViewActionButton {
 
     func actionForState(_ state: MapViewState) {
         switch state {
-        case .searchingForLocation:
-            mapState = .noInput
-        case .locationSelected:
-            mapState = .noInput
+        case .searching:
+            mapState = .idle
+        case .locationConfirmed, .routePlotted:
+            mapState = .idle
             locationSearchViewModel.selectedLocation = nil
         default:
             break
@@ -52,7 +52,7 @@ private extension MapViewActionButton {
 
     func imageNameForState(_ state: MapViewState) -> String {
         switch state {
-        case .noInput:
+        case .idle:
             return "line.3.horizontal"
         default:
             return "arrow.left"

@@ -10,7 +10,7 @@ import MapKit
 
 struct HomeView: View {
     @EnvironmentObject var locationSearchViewModel: LocationSearchViewModel
-    @State private var mapState = MapViewState.noInput
+    @State private var mapState = MapViewState.idle
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -18,14 +18,14 @@ struct HomeView: View {
                 MapViewRepresentable(mapState: $mapState)
                     .ignoresSafeArea()
 
-                if mapState == .searchingForLocation {
+                if mapState == .searching {
                     LocationSearchView(mapState: $mapState)
-                } else if mapState == .noInput {
+                } else if mapState == .idle {
                     LocationSearchActivationView()
                         .padding(.vertical, 72)
                         .onTapGesture {
                             withAnimation(.spring) {
-                                mapState = .searchingForLocation
+                                mapState = .searching
                             }
                         }
                 }
@@ -35,7 +35,7 @@ struct HomeView: View {
                     .padding(.top, 4)
             }
 
-            if mapState == .locationSelected {
+            if mapState == .locationConfirmed || mapState == .routePlotted {
                 RideRequestView()
                     .transition(.move(edge: .bottom))
             }

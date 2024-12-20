@@ -6,7 +6,8 @@
 //
 
 enum MapViewState {
-    case noInput
-    case searchingForLocation
-    case locationSelected
+    case idle
+    case searching
+    case locationConfirmed
+    case routePlotted
 }

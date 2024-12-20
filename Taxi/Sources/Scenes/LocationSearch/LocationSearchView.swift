@@ -39,7 +39,7 @@ struct LocationSearchView: View {
                             .onTapGesture {
                                 withAnimation(.spring) {
                                     locationSearchViewModel.selectLocation(result)
-                                    mapState = .locationSelected
+                                    mapState = .locationConfirmed
                                 }
                             }
                     }

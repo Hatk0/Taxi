@@ -26,16 +26,18 @@ struct MapViewRepresentable: UIViewRepresentable {
 
     func updateUIView(_ uiView: UIViewType, context: Context) {
         switch mapState {
-        case .noInput:
+        case .idle:
             context.coordinator.clearMapViewAndRecenterOnUserLocation()
             break
-        case .searchingForLocation:
+        case .searching:
             break
-        case .locationSelected:
+        case .locationConfirmed:
             if let coordinate = locationSearchViewModel.selectedLocation?.coordinate {
                 context.coordinator.addAndSelectedAnnotation(withCoordinate: coordinate)
                 context.coordinator.configurePolyline(withDestinationCoordinate: coordinate)
             }
+            break
+        case .routePlotted:
             break
         }
     }
@@ -95,6 +97,7 @@ extension MapViewRepresentable {
 
             parent.locationSearchViewModel.getDestinationRoute(from: userLocationCoordinate, to: coordinate) { route in
                 self.parent.mapView.addOverlay(route.polyline)
+                self.parent.mapState = .routePlotted
                 let rect = self.parent.mapView.mapRectThatFits(
                     route.polyline.boundingMapRect,
                     edgePadding: .init(top: 64, left: 32, bottom: 500, right: 32)
