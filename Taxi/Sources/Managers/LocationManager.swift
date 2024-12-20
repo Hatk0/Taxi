@@ -5,68 +5,71 @@
 //  Created by Dmitry Yastrebov on 19.12.2024.
 //
 
-import MapKit
+import SwiftUI
+import CoreLocation
 
 class LocationManager: NSObject, ObservableObject {
 
-    @Published var userLocation: CLLocation?
-    @Published var authorizationStatus: CLAuthorizationStatus?
+    @Published var userLocation: CLLocationCoordinate2D?
+    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
 
-    private lazy var locationManager: CLLocationManager = {
-        let manager = CLLocationManager()
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.delegate = self
-        return manager
-    }()
+    static let shared = LocationManager()
 
-    override init() {
+    private let locationManager = CLLocationManager()
+    private var isUpdatingLocation = false
+
+    override private init() {
         super.init()
-
-        Task {
-            await requestLocationAccess()
-        }
+        configureLocationManager()
     }
 
-    @MainActor
-    func requestLocationAccess() async {
-        let status = locationManager.authorizationStatus
-        self.authorizationStatus = status
+    func startUpdatingLocation() {
+        guard !isUpdatingLocation else { return }
+        isUpdatingLocation = true
+        locationManager.startUpdatingLocation()
+    }
 
-        switch status {
-        case .notDetermined:
-            locationManager.requestWhenInUseAuthorization()
-        case .authorizedWhenInUse, .authorizedAlways:
-            startUpdatingLocation()
-        case .denied, .restricted:
-            print("Location access denied or restricted.")
-        @unknown default:
-            print("Unknown location access status.")
-        }
+    func stopUpdatingLocation() {
+        guard isUpdatingLocation else { return }
+        isUpdatingLocation = false
+        locationManager.stopUpdatingLocation()
+    }
+
+    func requestLocationAccess() {
+        locationManager.requestWhenInUseAuthorization()
+    }
+}
+
+extension LocationManager {
+    func configureLocationManager() {
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
     }
 }
 
 extension LocationManager: CLLocationManagerDelegate {
-
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        self.userLocation = location
-    }
-
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("Failed to get user location: \(error.localizedDescription)")
+        guard let location = locations.first else { return }
+        userLocation = location.coordinate
+        stopUpdatingLocation()
     }
 
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        self.authorizationStatus = status
-        if status == .authorizedWhenInUse || status == .authorizedAlways {
+        authorizationStatus = status
+        switch status {
+        case .authorizedWhenInUse, .authorizedAlways:
             startUpdatingLocation()
+        case .denied, .restricted:
+            print("Location access denied or restricted.")
+        case .notDetermined:
+            print("Location authorization not determined yet.")
+        @unknown default:
+            print("Unhandled authorization status.")
         }
     }
-}
 
-private extension LocationManager {
-
-    func startUpdatingLocation() {
-        locationManager.startUpdatingLocation()
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Failed to get location: \(error.localizedDescription)")
     }
 }

@@ -9,8 +9,10 @@ import SwiftUI
 
 struct LocationSearchView: View {
     @Environment(\.colorScheme) var colorScheme
+    @EnvironmentObject var locationSearchViewModel: LocationSearchViewModel
     @State private var startLocationText = ""
     @State private var destinationLocationText = ""
+    @Binding var mapState: MapViewState
 
     private var theme: ColorTheme {
         ColorManager.getTheme(for: colorScheme)
@@ -19,8 +21,8 @@ struct LocationSearchView: View {
     var body: some View {
         VStack {
             SearchHeaderView(
+                locationSearchViewModel: locationSearchViewModel,
                 startLocationText: $startLocationText,
-                destinationLocationText: $destinationLocationText,
                 primaryColor: theme.primary,
                 secondaryColor: theme.secondary
             )
@@ -32,16 +34,18 @@ struct LocationSearchView: View {
 
             ScrollView {
                 VStack(alignment: .leading) {
-                    ForEach(1..<5, id: \.self) { _ in
-                        LocationSearchResultCell()
+                    ForEach(locationSearchViewModel.results, id: \.self) { result in
+                        LocationSearchResultCell(title: result.title, subtitle: result.subtitle)
+                            .onTapGesture {
+                                withAnimation(.spring) {
+                                    locationSearchViewModel.selectLocation(result)
+                                    mapState = .locationConfirmed
+                                }
+                            }
                     }
                 }
             }
         }
         .background(Color(.systemBackground))
     }
-}
-
-#Preview {
-    LocationSearchView()
 }

@@ -9,37 +9,42 @@ import SwiftUI
 import MapKit
 
 struct HomeView: View {
-    @StateObject private var locationManager = LocationManager()
-    @State private var showLocationSearchView = false
-    var body: some View {
-        ZStack(alignment: .top) {
-            Map(coordinateRegion: .constant(
-                MKCoordinateRegion(
-                    center: locationManager.userLocation?.coordinate ?? CLLocationCoordinate2D(),
-                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-                )
-            ), showsUserLocation: true)
-            .ignoresSafeArea()
+    @EnvironmentObject var locationSearchViewModel: LocationSearchViewModel
+    @State private var mapState = MapViewState.idle
 
-            if showLocationSearchView {
-                LocationSearchView()
-            } else {
-                LocationSearchActivationView()
-                    .padding(.vertical, 72)
-                    .onTapGesture {
-                        withAnimation(.spring) {
-                            showLocationSearchView.toggle()
+    var body: some View {
+        ZStack(alignment: .bottom) {
+            ZStack(alignment: .top) {
+                MapViewRepresentable(mapState: $mapState)
+                    .ignoresSafeArea()
+
+                if mapState == .searching {
+                    LocationSearchView(mapState: $mapState)
+                } else if mapState == .idle {
+                    LocationSearchActivationView()
+                        .padding(.vertical, 72)
+                        .onTapGesture {
+                            withAnimation(.spring) {
+                                mapState = .searching
+                            }
                         }
-                    }
+                }
+
+                MapViewActionButton(mapState: $mapState)
+                    .padding(.leading)
+                    .padding(.top, 4)
             }
 
-            MapViewActionButton(showLocationSearchingView: $showLocationSearchView)
-                .padding(.leading)
-                .padding(.top, 4)
+            if mapState == .locationConfirmed || mapState == .routePlotted {
+                RideRequestView()
+                    .transition(.move(edge: .bottom))
+            }
+        }
+        .ignoresSafeArea(edges: .bottom)
+        .onReceive(LocationManager.shared.$userLocation) { location in
+            if let location = location {
+                locationSearchViewModel.userLocation = location
+            }
         }
     }
-}
-
-#Preview {
-    HomeView()
 }

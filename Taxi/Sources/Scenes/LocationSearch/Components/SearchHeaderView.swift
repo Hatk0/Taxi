@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct SearchHeaderView: View {
+    @ObservedObject var locationSearchViewModel: LocationSearchViewModel
     @Binding var startLocationText: String
-    @Binding var destinationLocationText: String
 
     let primaryColor: Color
     let secondaryColor: Color
@@ -25,7 +25,7 @@ struct SearchHeaderView: View {
 
                 Divider()
 
-                TextField("Where to?", text: $destinationLocationText)
+                TextField("Where to?", text: $locationSearchViewModel.queryFragment)
                     .frame(height: 32)
                     .padding(.trailing)
             }
