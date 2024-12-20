@@ -38,7 +38,7 @@ struct LocationSearchView: View {
                         LocationSearchResultCell(title: result.title, subtitle: result.subtitle)
                             .onTapGesture {
                                 withAnimation(.spring) {
-                                    locationSearchViewModel.selectLocation(result.title)
+                                    locationSearchViewModel.selectLocation(result)
                                     showLocationSearchView.toggle()
                                 }
                             }
